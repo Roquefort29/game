@@ -1,0 +1,78 @@
+[gd_scene load_steps=9 format=3 uid="uid://cb6hh8w0www2j"]
+
+[ext_resource type="Texture2D" uid="uid://yohrgksdmpjs" path="res://Suriken/00.png" id="1_2rkd0"]
+[ext_resource type="Texture2D" uid="uid://c8g4hdus78h8g" path="res://Suriken/01.png" id="2_qveg7"]
+[ext_resource type="Texture2D" uid="uid://bpg6slwykdg75" path="res://Suriken/25.png" id="3_54ed4"]
+[ext_resource type="Texture2D" uid="uid://d0hddppawmfkt" path="res://Suriken/02.png" id="4_ratf5"]
+[ext_resource type="Texture2D" uid="uid://cv5h12vo8tskc" path="res://Suriken/26.png" id="5_g7hua"]
+
+[sub_resource type="GDScript" id="GDScript_klqqc"]
+script/source = "extends Area2D
+
+const SPEED = 100
+var velocity = Vector2( )
+var direction = 1
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	pass # Replace with function body.
+
+func set_suriken_direction(dir): 
+	direction = dir
+	if dir == -1:
+		$AnimatedSprite2D.flip_h = true
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _physics_process(delta):
+	velocity.x = SPEED * delta * direction
+	translate(velocity)
+	$AnimatedSprite2D.play(\"shoot\")
+
+
+func _on_visible_on_screen_notifier_2d_screen_exited():
+	queue_free()
+"
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_riega"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_2rkd0")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_qveg7")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_54ed4")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_ratf5")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_g7hua")
+}],
+"loop": true,
+"name": &"shoot",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_fa377"]
+size = Vector2(32, 33)
+
+[node name="Suriken" type="Area2D"]
+script = SubResource("GDScript_klqqc")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_riega")
+animation = &"shoot"
+frame_progress = 0.328066
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -0.5)
+shape = SubResource("RectangleShape2D_fa377")
+
+[node name="VisibleOnScreenNotifier2D" type="VisibleOnScreenNotifier2D" parent="."]
+position = Vector2(0.500001, -1)
+scale = Vector2(2.45, 2.1)
+
+[connection signal="body_entered" from="." to="." method="_on_body_entered"]
+[connection signal="screen_exited" from="VisibleOnScreenNotifier2D" to="." method="_on_visible_on_screen_notifier_2d_screen_exited"]
